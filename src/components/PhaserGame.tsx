@@ -10,7 +10,7 @@ class Breakout extends Phaser.Scene {
   }
 
   /**
-   * @description // 필요한 assets을 로드한다.
+   * @description 필요한 assets을 로드한다.
    */
   preload() {
     this.load.atlas("assets", "/assets/games/breakout.png", "/assets/games/breakout.json");
