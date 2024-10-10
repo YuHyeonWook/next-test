@@ -2,11 +2,11 @@ import React, {useEffect, useRef} from "react";
 import Phaser from "phaser";
 
 class Breakout extends Phaser.Scene {
+  bricks!: Phaser.Physics.Arcade.StaticGroup;
+  ball!: Phaser.Physics.Arcade.Image;
+  paddle!: Phaser.Physics.Arcade.Image;
   constructor() {
     super({key: "breakout"});
-    this.bricks;
-    this.paddle;
-    this.ball;
   }
 
   /**
@@ -33,12 +33,24 @@ class Breakout extends Phaser.Scene {
 
     this.paddle = this.physics.add.image(400, 550, "assets", "paddle1").setImmovable();
 
-    this.physics.add.collider(this.ball, this.bricks, this.hitBrick, null, this);
-    this.physics.add.collider(this.ball, this.paddle, this.hitPaddle, null, this);
+    this.physics.add.collider(
+      this.ball,
+      this.bricks,
+      this.hitBrick as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback,
+      undefined,
+      this,
+    );
+    this.physics.add.collider(
+      this.ball,
+      this.paddle,
+      this.hitPaddle as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback,
+      undefined,
+      this,
+    );
 
     this.input.on(
       "pointermove",
-      function (pointer) {
+      (pointer: Phaser.Input.Pointer) => {
         this.paddle.x = Phaser.Math.Clamp(pointer.x, 52, 748);
 
         if (this.ball.getData("onPaddle")) {
@@ -50,7 +62,7 @@ class Breakout extends Phaser.Scene {
 
     this.input.on(
       "pointerup",
-      function (pointer) {
+      (pointer: Phaser.Input.Pointer) => {
         if (this.ball.getData("onPaddle")) {
           this.ball.setVelocity(-75, -300);
           this.ball.setData("onPaddle", false);
@@ -60,7 +72,7 @@ class Breakout extends Phaser.Scene {
     );
   }
 
-  hitBrick(ball, brick) {
+  hitBrick(ball: Phaser.Physics.Arcade.Image, brick: Phaser.Physics.Arcade.Image) {
     brick.disableBody(true, true);
 
     if (this.bricks.countActive() === 0) {
@@ -78,11 +90,12 @@ class Breakout extends Phaser.Scene {
     this.resetBall();
 
     this.bricks.children.each((brick) => {
-      brick.enableBody(false, 0, 0, true, true);
+      (brick as Phaser.Physics.Arcade.Image).enableBody(false, 0, 0, true, true);
+      return true;
     });
   }
 
-  hitPaddle(ball, paddle) {
+  hitPaddle(ball: Phaser.Physics.Arcade.Image, paddle: Phaser.Physics.Arcade.Image) {
     let diff = 0;
 
     if (ball.x < paddle.x) {
@@ -104,7 +117,7 @@ class Breakout extends Phaser.Scene {
 }
 
 const BreakoutGame = () => {
-  const gameRef = useRef(null);
+  const gameRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
