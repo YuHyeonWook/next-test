@@ -5,6 +5,8 @@ class Breakout extends Phaser.Scene {
   bricks!: Phaser.Physics.Arcade.StaticGroup;
   ball!: Phaser.Physics.Arcade.Image;
   paddle!: Phaser.Physics.Arcade.Image;
+  score: number = 0;
+  scoreText!: Phaser.GameObjects.Text;
   constructor() {
     super({key: "breakout"});
   }
@@ -32,6 +34,10 @@ class Breakout extends Phaser.Scene {
     this.ball.setData("onPaddle", true);
 
     this.paddle = this.physics.add.image(400, 550, "assets", "paddle1").setImmovable();
+
+    this.scoreText = this.add.text(16, 16, "Score: 0", {
+      fontSize: "32px",
+    });
 
     this.physics.add.collider(
       this.ball,
@@ -74,6 +80,9 @@ class Breakout extends Phaser.Scene {
 
   hitBrick(ball: Phaser.Physics.Arcade.Image, brick: Phaser.Physics.Arcade.Image) {
     brick.disableBody(true, true);
+
+    this.score += 100;
+    this.scoreText.setText(`Score: ${this.score}`);
 
     if (this.bricks.countActive() === 0) {
       this.resetLevel();
